@@ -15,7 +15,7 @@
 # ⡿⠾⠇⠀⣿⡐⣨⣧⣾⣿⣿⡇⠈⢻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 # ⡗⡟⠀⠀⣿⣿⣾⣿⣿⣿⠉⢰⡄⠘⢷⣮⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
-distro=$(awk -F= '/^ID=/{print tolower($2)}' /etc/os-release)
+distro=$(awk -F= '/^ID=/{print tolower($2)}' /etc/os-release | tr -d '"')
 packages="fzf lf tmux"
 
 # Print Functions
@@ -108,7 +108,7 @@ case "$distro" in
         print_info "Ubuntu detected. Installing packages with apt."
         sudo apt install $packages && print_success "Packages installed successfully."
         ;;
-    opensuse) 
+    opensuse*) 
         print_info "OpenSUSE detected. Installing packages with zypper."
         sudo zypper in $packages && print_success "Packages installed successfully."
         ;;

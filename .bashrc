@@ -1,7 +1,7 @@
 lfcd () {
     cd "$(command lf -print-last-dir "$@")"
 }
-bindkey -s '^o' 'lfcd\n'
+bind -x '"\C-o": "lfcd"'
 
 alias v='vim'
 alias s='sudo'
@@ -27,7 +27,7 @@ alias gf='cd "$(find ~ -maxdepth 5 -type d -print | fzf)"'
 
 alias l='ls'
 alias la='ls -a'
-alias ll='ls -laf'
+alias ll='ls -laF'
 alias lt='tree'
 
 alias c='cat'
