@@ -15,8 +15,6 @@
 # ⡿⠾⠇⠀⣿⡐⣨⣧⣾⣿⣿⡇⠈⢻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 # ⡗⡟⠀⠀⣿⣿⣾⣿⣿⣿⠉⢰⡄⠘⢷⣮⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
-distro=$(awk -F= '/^ID=/{print tolower($2)}' /etc/os-release | tr -d '"')
-packages="fzf lf tmux"
 
 # Print Functions
 print_message() {
@@ -42,34 +40,6 @@ print_info() {
     print_message 36 "INFO" "$1"  # Cyan color for general messages (36)
 }
 
-copy_folder() {
-    local source=("$1"/*)  # Capture the list of files and directories
-    local destination="$2"
-
-    if ! ls "$destination" &>/dev/null; then # if folder is missing create it
-        mkdir -p $destination
-    fi
-
-    print_info "Copying files from $1 to $destination"
-    if cp -rf "${source[@]}" "$destination"; then # copy folder
-        print_success "Files copied successfully to $destination"
-    else
-        print_error "Error while copying to $destination"
-        exit 1
-    fi
-}
-copy_files() {
-    local source=$1 
-    local destination="$2"
-
-    print_info "Copying files from $1 to $destination"
-    if cp -f "$source" "$destination"; then # copy file
-        print_success "Files copied successfully to $destination"
-    else
-        print_error "Error while copying to $destination"
-        exit 1
-    fi
-}
 ask_for_confirmation() {
     print_warning "Caution: This script overwrites config files for $packages."
     read -p "Do you want to continue? (y/n): " choice
@@ -82,42 +52,49 @@ ask_for_confirmation() {
     esac
 }
 
+clone_repository() {
+    local repository_url="$1"
+    local destination="$2"
+
+    print_info "Cloning $repository_url"
+    git clone --quiet "$repository_url" "$destination" && print_success "Cloned $destination successfully" || print_error "Error cloning $repository_url to $destination"
+    ls $destination/.git >/dev/null 2>&1 && rm -rf $destination/.git
+}
+# copy function
+copy() {
+    local source=$1 
+    local destination="$2"
+    print_info "Copying files from $source to $destination"
+    cp -rf "$source" "$destination" && print_success "Files copied successfully to $destination" || print_error "Error while copying to $destination"
+}
+
+# Check for internet connection
+ping -q -c 1 -W 1 github.com &>/dev/null || {
+    print_error "No internet connection. Exiting..." 
+    exit 1 
+}
+
 # Check Folder
-if ! ls $(pwd)/install.sh &>/dev/null; then
-    print_error "Please open folder with this script before running it"
-    exit 1
-fi
+ls $(pwd)/install.sh &>/dev/null || { 
+    print_error "Please open folder with this script before running it" 
+    exit 1 
+}
 
 # Actual Script
 ask_for_confirmation
 
-case "$distro" in
-    arch) 
-        print_info "Arch Linux detected. Installing packages with pacman."
-        sudo pacman -S $packages && print_success "Packages installed successfully."
-        ;;
-    debian) 
-        print_info "Debian detected. Installing packages with apt."
-        sudo apt install $packages && print_success "Packages installed successfully."
-        ;;
-    fedora) 
-        print_info "Fedora detected. Installing packages with dnf."
-        sudo dnf install $packages && print_success "Packages installed successfully."
-        ;;
-    ubuntu) 
-        print_info "Ubuntu detected. Installing packages with apt."
-        sudo apt install $packages && print_success "Packages installed successfully."
-        ;;
-    opensuse*) 
-        print_info "OpenSUSE detected. Installing packages with zypper."
-        sudo zypper in $packages && print_success "Packages installed successfully."
-        ;;
-    *)
-        print_warning "Unknown distribution. Manual installation required."
-        ;;
-esac
 
-copy_folder ./.config ~/.config/
-copy_files ./.bashrc ~/.bashrc
+# Copy files to ~/.config directory
+copy ./.config ~/ &
+# Copy .zshrc
+copy ./.zshrc ~/ &
+# Copy Bashrc
+copy ./.bashrc ~/ &
+
+# install zsh plugins
+clone_repository https://github.com/Aloxaf/fzf-tab ~/.config/zsh/fzf-tab
+clone_repository https://github.com/zsh-users/zsh-autosuggestions.git ~/.config/zsh/zsh-autosuggestions
+clone_repository https://github.com/zsh-users/zsh-history-substring-search.git ~/.config/zsh/zsh-history-substring-search
+clone_repository https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.config/zsh/zsh-syntax-highlighting
 
 tmux source-file ~/.config/tmux/tmux.conf
