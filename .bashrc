@@ -17,7 +17,7 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-PROMPT_COMMAND='PS1_CMD1=$(ip route get 1.1.1.1 | awk -F"src " '"'"'NR == 1{ split($2, a," ");print a[1]}'"'"')'; PS1='\[\e[95;1m\][\[\e[94m\]\u\[\e[39m\]@\[\e[94m\]\H\[\e[39m\](\[\e[0;96m\]${PS1_CMD1}\[\e[0;1m\])\[\e[95m\]]\[\e[0m\] \[\e[95;1m\][\[\e[0;94m\]\w\[\e[95;1m\]]\n>\[\e[0m\] '
+PS1='\[\e[95;1m\][\[\e[94m\]\u\[\e[39m\]@\[\e[94m\]\H\[\e[95m\]]\[\e[0m\] \[\e[95;1m\][\[\e[94m\]\w\[\e[95m\]]\n\[\e[95m\]>\[\e[0m\] '
 
 source ~/.config/zsh/aliases.zsh
 source ~/.config/zsh/env.zsh

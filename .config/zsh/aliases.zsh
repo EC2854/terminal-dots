@@ -2,7 +2,6 @@
 # this file in sourced in .zshrc and .bashrc
 
 # misc
-alias vim='nvim'
 alias v='nvim'
 alias s='sudo'
 alias rg='rg -p' 

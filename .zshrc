@@ -30,7 +30,11 @@ source ~/.config/zsh/aliases.zsh
 eval "$(zoxide init --cmd cd zsh)"
 
 # Starship prompt
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
+PROMPT="%B%F{magenta}[%f%b%B%F{blue}%n%f%b%B@%b%B%F{blue}%m%f%b%B%F{magenta}] [%f%b%B%F{blue}%~%f%b%F{magenta}]%f
+%B%F{magenta}> %f%b"
+# RPROMPT="%B%F{magenta}[%f%b%B%F{blue}%T%f%b%B%F{magenta}]%f%b"
+
 
 # Fastfetch with random image
 fastfetch --logo-height 6 --sixel "$(find ~/Pictures/Anime-Girls-Holding-Programming-Books -type f | shuf -n 1)"
